@@ -1,0 +1,10 @@
+name: us-food-insecurity-dashboard
+title:
+username: conrad-linus-muhirwe
+account: conrad-linus-muhirwe
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 16277869
+bundleId: 11306314
+url: https://conrad-linus-muhirwe.shinyapps.io/us-food-insecurity-dashboard/
+version: 1
