@@ -2,16 +2,16 @@
 title: "Food Insecurity Shiny App User Guide"
 subtitle: "Investigating U.S. Food Insecurity Through Data"
 author: "Conrad Muhirwe, Sharon Wanyana, Ryann Tompkins, Alex Arevalo"
-date: "December 9, 2024"
+date: today
 format: 
   html:
     embed-resources: true
     toc: true
     toc-depth: 3
     number-sections: true
-    code-fold: true
-    theme: cosmo
-    fig-cap-location: bottom
+    fig-pos: 'H'
+    fig-width: 7
+    fig-height: 5
 bibliography: references.bib
 csl: apa.csl
 ---
@@ -20,426 +20,355 @@ csl: apa.csl
 
 ## The Problem
 
-Food insecurity—the lack of consistent access to enough food for an active, healthy life—affects **44.2 million Americans** (13.5% of households) as of 2023 [@coleman2023household]. This represents not just a nutritional challenge but a complex socioeconomic issue with profound implications for public health, child development, and economic stability. Disparities are stark: Black households experience food insecurity at 22.4%, Hispanic households at 20.8%, compared to 10.5% for white non-Hispanic households.
+Food insecurity—the lack of consistent access to enough food for an active, healthy life—affects **44.2 million Americans** (13.5% of households) as of 2023 [@alma9916546833607426]. These disparities reflect structural barriers including residential segregation, wage gaps, and differential access to quality employment [@myers2017food], with Black (22.4%) and Hispanic (20.8%) households experiencing rates more than double that of white non-Hispanic households (9.3%) [@rabbitt2023household].
 
 ## Target Users and Use Case
 
 **Primary Users:**
 
-- **Policymakers:** Federal, state, and local officials designing food assistance programs
-- **Researchers:** Academic investigators studying food security determinants
-- **Nonprofit Organizations:** Food banks and advocacy groups allocating resources
-- **Public Health Officials:** Practitioners addressing nutrition-related health outcomes
+-   **Policymakers:** Federal, state, and local officials designing food assistance programs
+-   **Researchers:** Academic investigators studying food security determinants
+-   **Nonprofit Organizations:** Food banks and advocacy groups allocating resources
+-   **Public Health Officials:** Practitioners addressing nutrition-related health outcomes
 
 **Key Questions This App Answers:**
 
-1. Which counties have the highest food insecurity rates and why?
-2. How do racial and socioeconomic disparities manifest geographically?
-3. What economic factors predict food insecurity at the county level?
-4. How have food insecurity patterns changed over 15 years (2009-2023)?
-5. Which counties share similar profiles for targeted interventions?
+1.  Which counties have the highest food insecurity rates and why?
+2.  How do racial and socioeconomic disparities manifest geographically?
+3.  What economic factors predict food insecurity at the county level?
+4.  How have food insecurity patterns changed over 15 years (2009-2023)?
+5.  Which counties share similar profiles for targeted interventions?
 
 ## App Workflow
 
 The application guides users through three progressive stages:
 
-1. **Overview:** Understand definitions, national context, and key trends
-2. **Exploration:** Visualize geographic patterns, temporal trends, and distributions
-3. **Analysis:** Apply statistical methods to test hypotheses and identify predictors
+1.  **Overview:** Understand definitions, national context, and key trends
+2.  **Exploration:** Visualize geographic patterns, temporal trends, and distributions
+3.  **Analysis:** Apply statistical methods to test hypotheses and identify predictors
 
 This vignette walks through each stage using realistic scenarios to demonstrate the app's capabilities.
 
 # Required Packages and Setup {#sec-packages}
 
-The application requires the following R packages:
+The application requires the following R packages with minimum version specifications:
 
-**Core Shiny:**
 ```{r}
 #| eval: false
 #| echo: true
 
-# Install required packages if needed
+# Core Shiny and Web Framework
 packages <- c(
   "shiny",        # >= 1.8.0  - Web application framework
-  "bslib",        # >= 0.6.0  - Bootstrap themes
-  "tidyverse",    # >= 2.0.0  - Data manipulation
+  "bslib",        # >= 0.6.0  - Bootstrap themes for modern UI
+  
+  # Data Manipulation and Visualization
+  "tidyverse",    # >= 2.0.0  - Data wrangling (dplyr, ggplot2, tidyr)
   "leaflet",      # >= 2.2.0  - Interactive maps
   "plotly",       # >= 4.10.0 - Interactive plots
   "DT",           # >= 0.31   - Interactive tables
-  "nnet",         # >= 7.3-19 - Multinomial regression
-  "rpart",        # >= 4.1-23 - Decision trees
-  "broom"         # >= 1.0.5  - Model tidying
+  
+  # Statistical Analysis
+  "nnet",         # >= 7.3-19 - Multinomial logistic regression
+  "rpart",        # >= 4.1-23 - Decision trees and CART
+  "broom"         # >= 1.0.5  - Model tidying and formatting
 )
 
 install.packages(packages)
 ```
 
-**Version Information:**
+**Development Environment:**
 
-All analyses were conducted using R version 4.3.2 with the packages listed above. The app is compatible with modern web browsers (Chrome, Firefox, Safari, Edge).
+-   R version: 4.3.2 or higher
+-   Compatible browsers: Chrome, Firefox, Safari, Edge (latest versions)
+-   Recommended screen resolution: 1920×1080 or higher for optimal visualization
 
 # Data Sources and Structure {#sec-data}
 
 ## Primary Data Sources
 
-The app integrates two authoritative datasets:
+The app integrates two authoritative datasets covering all U.S. counties from 2009-2023.
 
 ### Feeding America Map the Meal Gap (2009-2023)
 
-County-level food insecurity estimates published annually by Feeding America [@gundersen2024map]. Variables include:
+County-level food insecurity estimates published annually by Feeding America [@FeedingAmerica2025_MapTheMealGapData]. Key variables include:
 
-- Overall and child food insecurity rates
-- Food insecurity by race/ethnicity (Black, Hispanic, White)
-- Cost per meal and annual food budget shortfall
-- Number of food insecure persons
+-   Overall and child food insecurity rates
+-   Food insecurity by race/ethnicity (Black, Hispanic, White non-Hispanic)
+-   Cost per meal and annual food budget shortfall
+-   Number of food insecure persons and children
 
-**Access:** https://www.feedingamerica.org/research/map-the-meal-gap
+**Data Access:** https://www.feedingamerica.org/research/map-the-meal-gap/by-county
 
 ### U.S. Census Bureau American Community Survey
 
-ACS 5-Year Estimates provide socioeconomic context [@uscensus2024acs]:
+ACS 5-Year Estimates provide socioeconomic indicators [@USCensusBureau2024_ACS5Year]:
 
-- Poverty rates and median household income
-- Unemployment and employment statistics  
-- Educational attainment levels
-- Household composition (% female-headed households)
-- Demographic characteristics (race, ethnicity, age)
+-   Poverty rates and median household income
+-   Unemployment and labor force participation
+-   Educational attainment levels (% high school or less)
+-   Household composition (% female-headed households)
+-   Demographic characteristics (race/ethnicity percentages, age distribution)
 
-**Access:** https://www.census.gov/data/developers/data-sets/acs-5year.html
+**Data Access:** https://www.census.gov/data/developers/data-sets/acs-5year.html
 
 ## Data Structure
 
-**Observations:** 47,000+ county-year combinations
+**Observations:** 47,265 county-year combinations\
+**Geographic Coverage:** 3,156 counties across all 50 states + District of Columbia\
+**Temporal Coverage:** 15 years (2009-2023)\
+**Variables:** 52 processed variables
 
-**Geographic Coverage:** 3,156 counties across all 50 states + DC
+**Key Variable Categories:**
 
-**Temporal Coverage:** 15 years (2009-2023)
+-   **Outcomes:** Food insecurity rates (overall, child, by race/ethnicity)
+-   **Economic Predictors:** Poverty rate, median income, unemployment rate, SNAP participation
+-   **Demographic Factors:** Racial composition, educational attainment, household structure
+-   **Geographic Identifiers:** County FIPS codes, state, census region/division, urban/rural classification
 
-**Variables:** 50+ including:
+**Data Processing Pipeline:**
 
-- **Outcomes:** Food insecurity rates (overall, child, racial/ethnic)
-- **Economic:** Poverty, income, unemployment, SNAP participation
-- **Demographic:** Race, education, household structure, urban/rural classification
-- **Geographic:** County FIPS codes, state, census region/division
-
-**Data Processing:**
-
-1. Raw data harmonized across years (variable name changes addressed)
-2. County FIPS codes standardized for geographic joins
-3. Urban/rural classification derived from population density
-4. Categorical variables created for food insecurity, poverty, and income levels
+1.  Harmonization of variable names across 15 years of data collection
+2.  Standardization of county FIPS codes for spatial joins
+3.  Creation of categorical variables for food insecurity severity levels
+4.  Derivation of urban/rural classification from population density thresholds
 
 ```{r}
 #| eval: false
 #| echo: true
 
-# Example: Data structure
+# Example: Final data structure
 glimpse(food_data)
 # Rows: 47,265
 # Columns: 52
-# $ fips                    <chr> "01001", "01003", "01005"...
-# $ county                  <chr> "Autauga County", "Baldwin County"...
-# $ state                   <chr> "AL", "AL", "AL"...
-# $ year                    <dbl> 2023, 2023, 2023...
-# $ overall_fi_rate         <dbl> 12.4, 10.8, 14.2...
-# $ child_fi_rate           <dbl> 17.5, 14.9, 19.8...
-# $ poverty_rate            <dbl> 11.2, 9.8, 15.4...
-# $ median_income           <dbl> 63420, 68935, 49812...
+# $ fips                 <chr> "01001", "01003", "01005"...
+# $ county               <chr> "Autauga County", "Baldwin County"...
+# $ state                <chr> "AL", "AL", "AL"...
+# $ year                 <dbl> 2023, 2023, 2023...
+# $ overall_fi_rate      <dbl> 0.124, 0.108, 0.142...
+# $ child_fi_rate        <dbl> 0.175, 0.149, 0.198...
+# $ poverty_rate         <dbl> 0.112, 0.098, 0.154...
+# $ median_income        <dbl> 63420, 68935, 49812...
+# $ unemployment_rate    <dbl> 0.034, 0.029, 0.051...
+# $ fi_category          <fct> Moderate, Low, Moderate...
 ```
 
 # Exploratory Data Analysis Walkthrough {#sec-eda}
 
-## Scenario: Analyzing Food Insecurity in Rural Southern Counties
+This section demonstrates the app's exploratory capabilities through guided scenarios. Each walkthrough follows the format: research question → variable selection → visualization → interpretation.
 
-**Research Question:** How does food insecurity manifest in rural southern counties compared to urban areas, and what geographic patterns emerge?
+## Overview: Understanding the National Context
 
-### Step 1: Navigate to Overview Tab
+**Research Question:** What is the current state of food insecurity in the United States, and how does it vary across key demographic groups?
 
-Begin by understanding the national context. The Overview tab (@fig-overview) displays:
+**Variables Selected:** National food insecurity rate, total food insecure persons, child food insecurity rate, cost per meal
 
-- **Definition:** Food insecurity (FI) is clearly defined with the USDA standard
-- **National Metrics:** KPI cards show 13.5% national FI rate (2023)
-- **Key Insights:** Rural and southern counties consistently show 3-5 percentage points higher rates
+**Navigation:** Overview tab
 
-![Overview Tab showing national context and key performance indicators. The tab provides definitions, current statistics, and historical trends to orient users before detailed exploration.](images/overview_tab.png){#fig-overview}
+::: {#fig-overview layout-ncol="2"}
+![App introduction and food insecurity definition](../images/Overview_1.png){#fig-overview-intro}
 
-**Key Takeaway:** In 2023, 44.2 million Americans experienced food insecurity, with significant geographic and demographic disparities.
+![Key national indicators for 2023](../images/Overview_2.png){#fig-overview-kpi}
 
-### Step 2: Geographic Visualization with Filters
+Overview tab showing food insecurity context and national metrics
+:::
 
-Navigate to the **Exploration Tab → Map** sub-tab (@fig-map-exploration).
+**Interpretation:** @fig-overview demonstrates the app's introductory interface, where users first encounter the USDA definition of food insecurity and understand the scale of the problem. @fig-overview-kpi presents 2023 national indicators showing 15.3% of Americans (46.8 million people) experienced food insecurity, with children experiencing higher rates (20.2%) and the national average cost per meal at \$3.58. These metrics establish the baseline context for subsequent geographic and demographic exploration, revealing that food insecurity remains a substantial national challenge affecting nearly one in six Americans.
 
-**Filter Settings:**
+## Geographic Patterns: Mapping County-Level Disparities
 
-1. **Select State:** Choose "Mississippi" (known for high FI rates)
-2. **Select Year:** 2023 (most recent data)
-3. **Select Variable:** "Overall Food Insecurity Rate"
-4. **Urban/Rural:** Select "Rural" to focus on non-metropolitan areas
+**Research Question:** Which counties have the highest food insecurity rates, and how do patterns vary geographically across the United States?
 
-![Interactive map showing food insecurity rates across Mississippi counties. The map automatically zooms to the selected state, with counties color-coded by FI rate. Darker shades indicate higher food insecurity. Hovering over counties reveals detailed statistics.](images/map_mississippi.png){#fig-map-exploration}
+**Variables Selected:** Overall food insecurity rate (2023), county boundaries, state filters
 
-**Observations:**
+**Navigation:** Exploration tab → Map sub-tab
 
-- The map auto-zooms to Mississippi showing all 82 counties
-- Color gradient reveals concentration of high FI rates in Delta region
-- Humphreys County shows 23.8% FI rate (nearly double national average)
-- Urban centers (Jackson, Gulfport) show lower rates: 14-16%
+![Interactive map showing food insecurity rates by county in 2023, with darker colors indicating higher rates. Users can filter by state, select specific years, and click counties for detailed information. The map reveals clear geographic clustering, with the highest rates concentrated in the South and rural areas.](../images/Mississippi.png){#fig-map width="100%"}
 
-**Interactive Features:**
+**Interpretation:** @fig-map reveals stark geographic disparities in food insecurity, with the highest rates (dark red, 20-30%) concentrated in the Mississippi Delta. These patterns align with structural economic disadvantages in these regions, including persistent poverty, limited employment opportunities, and historical underinvestment. Conversely, the lowest rates (light green, \<10%) cluster in metropolitan areas and affluent suburban counties, particularly in the Northeast and upper Midwest. The spatial concentration suggests that food insecurity is not randomly distributed but reflects underlying geographic inequalities in economic opportunity and infrastructure.
 
-- Hover over counties to see: FI rate, population, poverty rate, median income
-- Click counties for detailed popup with full statistics
-- Summary table below map lists all counties with sortable columns
+## Temporal Trends: How Has Food Insecurity Changed?
 
-### Step 3: Temporal Trends Analysis
+**Research Question:** How have food insecurity rates evolved over the past 15 years, and what economic events influenced these trends?
 
-Switch to **Trends** sub-tab to examine changes over time (@fig-trends).
+**Variables Selected:** Overall food insecurity rate (2009-2023), year, optional state filter
 
-**Select:** "State-Level Trends" visualization
+**Navigation:** Exploration tab → Trends sub-tab → State Trends
 
-![Time series showing food insecurity trends for southern states (2009-2023). Lines show state-level patterns with clear spikes during Great Recession (2009-2010) and COVID-19 pandemic (2020). Southern states consistently track above national average (gray line).](images/state_trends_south.png){#fig-trends}
+![Time series visualization of food insecurity rates from 2009-2023, showing the Great Recession peak, steady decline through 2019, minimal COVID-19 impact in 2020, and sharp increases in 2022-2023 following inflation and program terminations.](../images/Trends Analysis.png){#fig-timeline width="100%"}
 
-**Key Patterns:**
+**Interpretation:** @fig-timeline demonstrates three distinct periods in food insecurity trends over 15 years. First, elevated rates during the Great Recession (2009-2011) peaked around 15-16%, reflecting massive job losses and economic contraction. Second, a steady decline from 2011-2019 coincided with economic recovery and employment growth, reaching a low near 11%. Third, and most revealing, food insecurity remained relatively stable during the initial COVID-19 pandemic (2020) due to emergency assistance programs, actually improved in 2021, then surged in 2022-2023 as inflation spiked and pandemic-era benefits terminated. This pattern underscores that economic policy interventions can effectively buffer food insecurity, but their withdrawal during periods of high food costs creates renewed vulnerability.
 
-1. **Great Recession Impact (2009-2010):** Mississippi peaked at 21.5% FI
-2. **Recovery Period (2011-2019):** Gradual decline to 17.2%
-3. **COVID-19 Spike (2020):** Increased to 19.1%
-4. **Recent Trends (2021-2023):** Stabilized around 18.5%
+## Racial Disparities: Examining Inequities Across Groups
 
-**Regional Comparison:**
+**Research Question:** How do food insecurity rates differ across racial and ethnic groups, and have these disparities changed over time?
 
-- Southern states (MS, LA, AR, AL) consistently 4-6 points above national average
-- Northeastern states (NH, MA, CT) consistently 2-3 points below
-- Gap has widened slightly over 15 years
+**Variables Selected:** Food insecurity rates by race/ethnicity (Black, Hispanic, White non-Hispanic), year (2009-2023)
 
-### Step 4: Racial Disparity Analysis
+**Navigation:** Exploration tab → Trends sub-tab → Racial Disparities
 
-Select **"Racial Disparities"** in the Trends sub-tab (@fig-racial-disparities).
+![Trend lines showing food insecurity rates by race/ethnicity from 2009-2023. Black and Hispanic populations consistently experience rates 2-3 times higher than white, non-Hispanic populations throughout the entire period.](../images/Trend Analysis_Racial_Disparities.png){#fig-racial-trends width="100%"}
 
-![Racial disparities in food insecurity rates (2009-2023). Four lines show trends for Black, Hispanic, White Non-Hispanic, and Overall populations. Black and Hispanic households experience FI rates approximately 10 percentage points higher than white households throughout the period.](images/racial_disparities.png){#fig-racial-disparities}
+**Interpretation:** @fig-racial-trends reveals persistent and substantial racial disparities in food insecurity that have remained remarkably stable over 15 years. Black individuals consistently experience rates of 22-25%, Hispanic individuals 18-22%, and white non-Hispanic individuals 8-12%, maintaining an approximate 2-3x disparity throughout economic cycles. Critically, these gaps did not narrow during periods of economic growth (2011-2019) nor widen disproportionately during recessions, indicating structural factors—such as wage gaps, occupational segregation, and differential access to wealth—that transcend economic conditions. The persistence of these disparities across varying economic contexts underscores that food insecurity among communities of color reflects systemic inequities rather than temporary economic fluctuations.
 
-**Findings:**
+**Additional Exploration Features:**
 
-- **Black households:** 22.4% FI rate (2023)
-- **Hispanic households:** 20.8% FI rate
-- **White non-Hispanic households:** 10.5% FI rate
-- **Overall rate:** 13.5%
+Users can further explore patterns using additional sub-tabs not shown here:
 
-The disparity gap has remained relatively constant over 15 years, suggesting structural inequities persist despite overall improvements.
+-   **Summary Table tab:** Provides grouped statistics by state/county to compare aggregate patterns
+-   **Data Viewer tab:** Allows custom filtering by year, state, or threshold values to identify specific counties of interest for detailed investigation
 
-### Step 5: Summary Tables and Data Export
-
-Navigate to **Data Viewer** sub-tab for detailed county-level data.
-
-**Features:**
-
-- Search for specific counties or states
-- Sort by any column (FI rate, poverty, income, etc.)
-- Filter by multiple criteria simultaneously
-- Export filtered results to CSV for external analysis
-
-**Example Export:** Rural southern counties with FI rate > 20% yields 87 counties across 8 states, enabling targeted intervention planning.
-
-## EDA Interpretation Summary
-
-This exploration revealed three critical findings:
-
-1. **Geographic Concentration:** High FI rates cluster in rural southern counties, particularly Mississippi Delta and Appalachia
-2. **Persistent Disparities:** Racial/ethnic gaps remain wide and stable over 15 years
-3. **Economic Shocks:** Great Recession and COVID-19 created lasting impacts, with rural areas showing slower recovery
-
-**Next Steps:** Use Analysis tab to quantify relationships between FI and socioeconomic predictors.
+These tools enable flexible exploration tailored to specific research questions or policy contexts.
 
 # Statistical Analysis Walkthrough {#sec-analysis}
 
-## Scenario: Identifying Predictors of County-Level Food Insecurity
+This section demonstrates the app's statistical analysis capabilities, progressing from correlation analysis to advanced modeling techniques.
 
-**Research Question:** Which economic and demographic factors most strongly predict food insecurity, and do disparities persist after controlling for poverty?
+## Correlation Analysis: Identifying Key Predictors
 
-### Step 6: Correlation Analysis
+**Research Question:** Which socioeconomic and demographic variables show the strongest bivariate relationships with food insecurity?
 
-Navigate to **Analysis Tab → Correlation Analysis** (@fig-correlation).
+**Variables Selected:** Overall food insecurity rate, poverty rate, median income, unemployment rate, educational attainment (% HS or less), household structure (% female-headed), racial composition (% Black, % Hispanic)
 
-**Variable Selection:**
+**Navigation:** Analysis tab → Correlation method
 
-- Outcome: `overall_fi_rate`
-- Predictors: `poverty_rate`, `median_income`, `unemployment_rate`, `pct_nonwhite`, `pct_hs_or_less`, `pct_female_headed_household`
+![Correlation heatmap showing pairwise relationships between food insecurity and socioeconomic predictors. Darker colors indicate stronger correlations.](../images/Correlation Results.png){#fig-correlation width="100%"}
 
-Click **"Run Correlation Analysis"**
+**Interpretation:** @fig-correlation reveals poverty rate as the single strongest correlate of food insecurity (r ≈ 0.77), demonstrating that direct economic deprivation is the primary driver of food access limitations. Median income shows a strong negative correlation (r ≈ -0.60), confirming that higher household resources reduce food insecurity risk. Unemployment rate (r ≈ 0.55) and female-headed households (r ≈ 0.46) show moderately strong positive associations, highlighting labor market instability and single-parent household vulnerability. Educational attainment (% HS or less) exhibits a weaker but still meaningful correlation (r ≈ 0.35), suggesting education's role operates partly through its effects on employment and income. These bivariate relationships establish which factors warrant inclusion in multivariate models and indicate that economic conditions dominate individual-level food insecurity risk.
 
-![Correlation matrix heatmap showing relationships between food insecurity and socioeconomic variables. Dark blue indicates strong positive correlation, red indicates negative correlation. Poverty rate shows strongest correlation (0.77) with food insecurity.](images/correlation_matrix.png){#fig-correlation}
+## Linear Regression: Estimating Predictor Effects
 
-**Key Correlations:**
+**Research Question:** After controlling for multiple factors simultaneously, which variables remain significant predictors of county-level food insecurity rates?
 
-- **Poverty rate:** r = 0.77 (very strong positive)
-- **Median income:** r = -0.60 (strong negative)
-- **% High school or less:** r = 0.63 (strong positive)
-- **% Non-white:** r = 0.58 (moderate positive)
-- **Unemployment rate:** r = 0.55 (moderate positive)
-- **% Female-headed households:** r = 0.52 (moderate positive)
+**Variables Selected:** Outcome: overall_fi_rate; Predictors: poverty_rate, median_income, unemployment_rate, hs_or_less, black_pct, hispanic_pct, female_headed
 
-**Interpretation:**
+**Model Specification:** Ordinary least squares regression
 
-Poverty rate emerges as the strongest predictor, but demographic factors (race, education, household structure) show independent associations even beyond economic measures. This suggests structural barriers beyond just current income levels.
+**Navigation:** Analysis tab → Linear Regression method
 
-### Step 7: Multiple Linear Regression
+**Results:**
 
-Select **Linear Regression** method (@fig-regression).
-
-**Model Specification:**
-
-- Outcome: `overall_fi_rate`
-- Predictors: `poverty_rate`, `median_income`, `unemployment_rate`, `pct_nonwhite`, `pct_hs_or_less`
-
-Click **"Run Regression"**
-
-![Regression output showing model coefficients, standard errors, p-values, and R-squared. Model explains 72% of variance in food insecurity rates. All predictors are statistically significant at p<0.001 level.](images/regression_output.png){#fig-regression}
-
-**Model Results:**
-
-```
+```         
 Coefficients:
-                    Estimate  Std.Error  t-value  p-value
-(Intercept)          8.24      0.42      19.6    <0.001
-poverty_rate         0.31      0.02      15.5    <0.001
-median_income       -0.00003   0.000005  -6.2    <0.001
-unemployment_rate    0.18      0.04       4.5    <0.001
-pct_nonwhite         0.04      0.01       4.0    <0.001
-pct_hs_or_less       0.05      0.01       5.0    <0.001
+                   Estimate Std. Error t value Pr(>|t|)    
+(Intercept)        0.0874   0.0011     81.98   <2e-16 ***
+poverty_rate       0.3464   0.0035     98.27   <2e-16 ***
+median_income     -3.1e-07  1.2e-08   -26.38   <2e-16 ***
+unemployment_rate  0.1086   0.0049     22.01   <2e-16 ***
+black_pct          0.0298   0.0013     23.86   <2e-16 ***
+female_headed      0.1643   0.0108     15.27   <2e-16 ***
+hispanic_pct      -0.0161   0.0012    -14.01   <2e-16 ***
+hs_or_less        -0.0051   0.0033     -1.56    0.118    
 
-R-squared: 0.72
-Adjusted R-squared: 0.72
-F-statistic: 4,821 on 5 and 9,412 DF, p < 0.001
+Multiple R-squared: 0.6378,  Adjusted R-squared: 0.6378
+F-statistic: 8685 on 7 and 34523 DF,  p-value: < 2.2e-16
 ```
 
-**Interpretation:**
+**Interpretation:** The linear regression model explains 64% of variation in county-level food insecurity, with poverty rate emerging as the dominant predictor (β = 0.35, p \< 0.001)—a one-percentage-point increase in poverty associates with a 0.35-point increase in food insecurity. Economic factors (poverty, income, unemployment) remain highly significant even after controlling for demographics, confirming their direct causal influence. Critically, racial composition (% Black) and household structure (% female-headed) retain independent effects, indicating that structural and demographic factors shape food insecurity beyond economic conditions alone. The negative coefficient for % Hispanic (β = -0.016, p \< 0.001) likely reflects geographic confounding or differences in SNAP eligibility rather than protective effects. Educational attainment loses significance (p = 0.118) after controlling for income and employment, suggesting education operates primarily through economic pathways rather than directly.
 
-1. **Poverty rate:** For each 1 percentage point increase in poverty, FI increases by 0.31 points (holding other factors constant)
-2. **Median income:** $10,000 increase in median income reduces FI by 0.3 percentage points
-3. **Race:** After controlling for economic factors, counties with higher percentages of non-white residents show elevated FI rates—evidence of structural disparities
-4. **Education:** Lower educational attainment predicts higher FI independent of current economic conditions
+## Multinomial Logistic Regression: Modeling Severity Categories
 
-**Model Fit:** The model explains 72% of variance in county-level FI rates—strong for social science data.
+**Research Question:** What factors distinguish counties with moderate, high, and very high food insecurity from low-FI counties?
 
-**Policy Implications:** Both economic interventions (poverty reduction, wage growth) and structural equity measures (addressing racial barriers, education access) are needed to reduce food insecurity.
+**Variables Selected:** Outcome: fi_category (Low \<10%, Moderate 10-15%, High 15-20%, Very High \>20%); Predictors: same as linear model
 
-### Step 8: Multinomial Logistic Regression
+**Navigation:** Analysis tab → Multinomial Logistic Regression method
 
-Select **Multinomial Logistic Regression** for categorical outcomes (@fig-multinomial).
+![Multinomial logistic regression coefficients showing how predictors influence the odds of being in higher food insecurity categories relative to the Low category baseline.](../images/Multinomial_Analysis.png){#fig-multinomial width="100%"}
 
-**Outcome Categories:**
+**Interpretation:** @fig-multinomial demonstrates that economic distress (poverty and unemployment) primarily drives escalation into higher food insecurity categories, with coefficient magnitudes increasing progressively from Moderate to Very High categories. Poverty rate shows the steepest gradient (coefficients: 26.8 for Moderate, 45.3 for High, 40.2 for Very High vs Low), indicating exponential increases in odds as poverty deepens. Unemployment rate becomes increasingly important at higher severity levels (coefficients: 18.1, 26.0, 42.1), suggesting labor market instability is especially critical for preventing extreme food insecurity. Racial composition (% Black) and household structure (% female-headed) remain statistically significant across all comparisons, confirming that demographic factors independently shape severity beyond economic conditions. These categorical distinctions suggest different intervention strategies may be needed: poverty reduction for moderate FI, employment support for severe FI, and structural equity policies to address persistent demographic disparities.
 
-- Low FI: < 10%
-- Moderate FI: 10-15%
-- High FI: 15-20%
-- Very High FI: > 20%
+## Decision Tree: Identifying Classification Rules
 
-**Predictors:** Same as linear model
+**Research Question:** What are the most important decision thresholds for classifying counties into high vs low food insecurity categories?
 
-![Multinomial regression showing relative risk ratios for each FI category compared to baseline (Low FI). Table displays odds ratios with 95% confidence intervals. Counties with high poverty are 8.2 times more likely to be in Very High FI category.](images/multinomial_output.png){#fig-multinomial}
+**Variables Selected:** Outcome: high_fi (binary: \>15% vs ≤15%); Predictors: same as previous models
 
-**Key Findings:**
+**Navigation:** Analysis tab → Decision Tree method
 
-Compared to Low FI counties, Very High FI counties have:
+![Classification tree showing poverty rate as the primary split variable, with clear threshold-based separation of counties into food insecurity risk levels.](../images/Decision_Tree.png){#fig-tree width="100%"}
 
-- **8.2x higher odds** if poverty rate is above 20%
-- **6.5x higher odds** if in rural South region
-- **4.8x higher odds** if predominantly non-white population
+**Interpretation:** @fig-tree reveals that poverty rate alone serves as the primary classifier for distinguishing high vs low food insecurity counties, with critical thresholds at approximately 16% and 25% poverty. Counties below 16% poverty almost universally experience low food insecurity (\<15%), while counties exceeding 25% poverty overwhelmingly experience high food insecurity (\>15%). Other predictors—including race, income, education, and household structure—do not appear as primary split variables in the top levels of the tree, indicating their effects operate primarily through poverty rather than independently in categorical outcomes. This nonlinear, threshold-based pattern contrasts with linear models and suggests that preventing counties from crossing critical poverty tipping points (especially 16% and 25%) is more consequential than gradual poverty reduction across all counties. Counties above 25% poverty represent extreme vulnerability zones requiring intensive interventions to prevent catastrophic food access failures.
 
-These multiplicative effects show how disadvantages compound.
+## Principal Component Analysis: Dimensionality Reduction
 
-### Step 9: K-Means Clustering for County Segmentation
+**Research Question:** Can the multiple correlated socioeconomic indicators be summarized into a smaller number of underlying dimensions?
 
-Select **K-Means Clustering** method (@fig-kmeans).
+**Variables Selected:** All socioeconomic predictors (standardized)
 
-**Clustering Variables:**
+**Navigation:** Analysis tab → Principal Component Analysis method
 
-- `overall_fi_rate`
-- `poverty_rate`
-- `median_income`
-- `unemployment_rate`
-- `pct_nonwhite`
+![PCA biplot showing variable loadings and explained variance across principal components. Economic hardship variables (poverty, unemployment) load heavily on PC1.](../images/PCA.png){#fig-pca width="100%"}
+
+**Interpretation:** @fig-pca demonstrates that a small number of components capture most variation in socioeconomic determinants of food insecurity. The first principal component (PC1) represents overall economic hardship, with strong loadings from poverty rate, unemployment, and (negative) median income, explaining approximately 45% of total variance. The second component (PC2) captures demographic and structural factors, with loadings from racial composition and household structure, explaining an additional 18% of variance. This dimensionality reduction confirms that food insecurity determinants cluster into interpretable latent constructs: economic deprivation as the primary driver, with demographic and structural factors as distinct but secondary dimensions. The results align with regression and decision tree findings, reinforcing poverty's central role while highlighting that structural influences operate through partially independent pathways.
+
+## K-Means Clustering: Identifying County Profiles
+
+**Research Question:** Do U.S. counties cluster into distinct profiles based on food insecurity and socioeconomic characteristics?
+
+**Variables Selected:** Overall food insecurity rate, poverty rate, median income, unemployment rate, educational attainment, household structure, racial composition
 
 **Number of Clusters:** 4
 
-![K-means clustering results showing four distinct county profiles plotted in 2D principal component space. Each cluster is color-coded. Summary statistics table shows cluster characteristics: Affluent/Low-FI (n=1,842), Middle-Income/Moderate-FI (n=2,215), Economic-Distress/High-FI (n=1,623), Severe-Disadvantage/Very-High-FI (n=476).](images/kmeans_clusters.png){#fig-kmeans}
+**Navigation:** Analysis tab → K-Means Clustering method
 
-**Cluster Profiles:**
+::: {#fig-clusters layout-ncol="2"}
+![Cluster visualization showing geographic distribution](../images/K-means.png){#fig-cluster-map}
 
-1. **Cluster 1: Affluent/Low-FI (n=1,842 counties)**
-   - FI rate: 8.2%
-   - Poverty: 9.5%
-   - Median income: $75,400
-   - Characteristics: Suburban and exurban counties
+![Cluster summary statistics table](../images/K-Means_3.png){#fig-cluster-table}
 
-2. **Cluster 2: Middle-Income/Moderate-FI (n=2,215)**
-   - FI rate: 12.8%
-   - Poverty: 13.2%
-   - Median income: $58,300
-   - Characteristics: Small towns and rural counties with stable economies
+K-means clustering results identifying four distinct county profiles
+:::
 
-3. **Cluster 3: Economic-Distress/High-FI (n=1,623)**
-   - FI rate: 17.4%
-   - Poverty: 18.6%
-   - Median income: $46,200
-   - Characteristics: Rust Belt and rural manufacturing decline
+![Cluster simplified interpretation](../images/K-means_2.png){#fig-interpretation width="70%"}
 
-4. **Cluster 4: Severe-Disadvantage/Very-High-FI (n=476)**
-   - FI rate: 22.1%
-   - Poverty: 26.8%
-   - Median income: $38,500
-   - Characteristics: Persistent poverty counties (Appalachia, Delta, Native American reservations)
+**Interpretation:** @fig-clusters reveals four distinct county profiles that demonstrate food insecurity is driven by heterogeneous structural conditions, not poverty alone.
 
-**Application:** Policymakers can design cluster-specific interventions rather than one-size-fits-all approaches.
+-   **Cluster 1 (Highest Risk, n=3,988)** exhibits the most severe profile with 20% food insecurity, 25% poverty, low median income (\$39,200), and the highest share of Black residents (39%), representing areas with overlapping economic and racial vulnerabilities concentrated in the rural South and urban cores.
+-   **Cluster 2 (Lowest Risk, n=14,988)** encompasses the most advantaged counties with 11% food insecurity, 10% poverty, and highest median income (\$68,700), predominantly suburban and exurban areas with strong economic fundamentals.
+-   **Cluster 3 (Moderate Risk, n=13,201)** falls between extremes with 15% food insecurity and 18% poverty, representing counties particularly sensitive to economic shocks that could shift into higher-risk categories.
+-   **Cluster 4 (Hispanic-Concentrated, n=2,354)** shows moderately elevated food insecurity (14%) despite middle-range income (\$52,900), distinguished by very high Hispanic population share (51%), suggesting structural barriers beyond income such as language access or labor market segmentation.
 
-### Step 10: Decision Tree Classification
+These distinct profiles underscore the need for cluster-specific policy approaches: intensive poverty reduction in Cluster 1, economic stabilization in Cluster 3, and culturally tailored interventions in Cluster 4.
 
-Select **Decision Tree** method for interpretable classification rules (@fig-decision-tree).
+Together these tools provide flexibility for researchers to conduct hypothesis-driven analyses tailored to specific research questions.
 
-**Outcome:** High FI (binary: >15% vs ≤15%)
+# Conclusion: Key Takeaways and Implications {#sec-conclusion}
 
-**Predictors:** All available
+## Summary of Findings
 
-![Decision tree diagram showing hierarchical classification rules. Tree shows: "If poverty_rate > 15.2% AND unemployment > 6.8%, then High FI (probability = 0.89)". ROC curve shows AUC = 0.88, indicating strong predictive performance.](images/decision_tree.png){#fig-decision-tree}
+This vignette has demonstrated the Food Insecurity Shiny App's capabilities through systematic exploration and analysis of 47,000+ county-year observations spanning 2009-2023. Key substantive findings include:
 
-**Classification Rules:**
+1.  **Geographic Concentration:** Food insecurity is not uniformly distributed but concentrates in the rural South, Appalachia, and Mississippi Delta, with rates reaching 25-30% in the most affected counties
 
-```
-Rule 1: If poverty_rate ≤ 15.2%
-  → Low FI (probability = 0.92)
+2.  **Temporal Dynamics:** Food insecurity trends reflect economic policy impacts more than immediate economic shocks—rates remained stable during initial COVID-19 pandemic due to emergency assistance but surged in 2022-2023 following inflation and benefit terminations
 
-Rule 2: If poverty_rate > 15.2% AND unemployment ≤ 6.8%
-  → Moderate FI (probability = 0.68)
+3.  **Persistent Racial Disparities:** Black and Hispanic populations experience food insecurity at 2-3 times the rate of white populations, with disparities remaining constant across 15 years and all economic conditions
 
-Rule 3: If poverty_rate > 15.2% AND unemployment > 6.8%
-  → High FI (probability = 0.89)
-```
+4.  **Poverty as Primary Driver:** Poverty rate emerges as the single strongest predictor across all analytical approaches (correlation r=0.77, regression β=0.35, primary decision tree split)
 
-**Model Performance:**
+5.  **Heterogeneous County Profiles:** K-means clustering reveals distinct structural patterns requiring differentiated interventions rather than uniform national policies
 
-- Accuracy: 84%
-- Sensitivity: 81%
-- Specificity: 86%
-- AUC: 0.88
+## Policy Implications
 
-**Practical Use:** Simple rules enable county officials to assess FI risk using readily available economic indicators.
+These findings carry direct implications for food security policy:
 
-## Statistical Analysis Summary
+1.  **Economic Interventions Are Essential:** The dominant role of poverty and unemployment indicates that reducing food insecurity requires direct economic support—strengthening SNAP benefits, expanding EITC, and ensuring employment stability through macroeconomic policy.
+2.  **Racial Equity Must Be Centered:** Persistent disparities across all economic conditions demonstrate that poverty reduction alone is insufficient. Policies must explicitly address wage gaps, occupational segregation, and discriminatory barriers to economic opportunity.
+3.  **Geographic Targeting Is Warranted:** The concentration of extreme food insecurity in specific counties (particularly Cluster 1 in the k-means analysis) justifies place-based interventions with intensive resources directed to high-need areas.
+4.  **Policy Buffers Matter:** The 2020-2021 stability during pandemic assistance programs proves that well-designed safety nets can effectively mitigate food insecurity even during economic disruptions. Permanent program strengthening, not emergency-only responses, should be the policy goal.
+5.  **Structural Factors Require Structural Solutions:** The independent effects of race, household composition, and geography after controlling for income demonstrate that food insecurity reflects structural disadvantage. Interventions must address housing policy, transportation access, food retail redlining, and labor market structure—not just household income.
 
-Our comprehensive analysis revealed:
+## App Utility for Stakeholders
 
-1. **Primary Driver:** Poverty rate is the strongest predictor (r=0.77), but explains only 59% of variance alone
-2. **Structural Factors:** Racial composition, education, and household structure contribute independently, increasing explained variance to 72%
-3. **Nonlinear Effects:** Multinomial models show disadvantages compound multiplicatively
-4. **Actionable Segmentation:** Four distinct county profiles enable targeted interventions
-5. **Simple Decision Rules:** High FI can be predicted with 84% accuracy using poverty and unemployment thresholds
+This application serves distinct user communities:
 
-**Evidence-Based Policy Recommendations:**
+1.  **Researchers** can generate publication-quality analyses, test hypotheses about food insecurity determinants, and identify counties for case study investigation.
+2.  **Policymakers** can identify high-need jurisdictions for resource allocation, assess intervention priorities across different county profiles, and evaluate how policy changes might affect specific demographic groups.
+3.  **Nonprofits and Food Banks** can use geographic visualizations to optimize service delivery locations, understand demographic composition of service areas, and justify funding proposals with empirical evidence.
+4.  **Public Health Officials** can examine relationships between food insecurity and other health indicators, identify populations for targeted nutrition interventions, and monitor trends over time to assess program effectiveness.
 
-- Economic interventions (job creation, wage growth) are necessary but insufficient
-- Structural equity measures must address racial and educational barriers
-- Geographic targeting should focus resources on Cluster 4 counties
-- Different county profiles require different intervention strategies
+The combination of exploratory visualization and rigorous statistical analysis in a single accessible interface democratizes sophisticated food security research, enabling evidence-based decision making across stakeholder groups.
 
 # References {#sec-references}
 
@@ -448,41 +377,20 @@ Our comprehensive analysis revealed:
 
 # Individual Contributions {.unnumbered}
 
-```{r}
-#| echo: false
-#| include: false
+**App Development:**
 
-# This section documents individual contributions but is hidden from output
-# (include: false ensures it doesn't appear in rendered HTML)
+-   **Conrad Muhirwe:** GitHub management, project guide documentation, server and UI architecture design, census dataset merging and harmonization with the primary dataset, trends analysis implementation, statistical analysis modules (multinomial logistic regression, decision tree, PCA, k-means clustering, group comparisons), README documentation, dashboard deployment
 
-# App Development:
-# - Conrad Muhirwe: Global data pipeline, server architecture, decision tree/k-means analysis, deployment
-# - Sharon Wanyana: Analysis tab UI/server, correlation/regression/multinomial models, statistical output rendering
-# - Ryann Tompkins: Overview tab UI/server, KPI calculations, map rendering, auto-zoom functionality
-# - Alex Arevalo: Exploration tab UI/server, trend visualizations, data viewer, racial disparity analysis
+-   **Sharon Wanyana:** Variable selection, UI design and layout, overview page development, statistical analysis modules (correlation matrix, linear regression), references
 
-# Data Preparation:
-# - Conrad: Primary data cleaning scripts, FIPS standardization, geographic coordinate integration
-# - Alex: Census ACS integration, variable harmonization across years
-# - Sharon: Categorical variable creation, data quality validation
-# - Ryann: Urban/rural classification, derived variables
+-   **Ryann Tompkins:** Visualization functions and plotting utilities
 
-# Vignette Development:
-# - All team members: Collaborative writing and review
-# - Ryann: Overview and EDA sections
-# - Alex: Data sources and structure documentation
-# - Sharon: Statistical analysis walkthrough
-# - Conrad: Technical setup, code examples, final integration
+-   **Alex Arevalo:** Data sourcing and data processing pipeline, map functions and spatial analysis, helper functions development
 
-# Other Deliverables:
-# - Project Plan (October): Joint effort, primary author Conrad
-# - Progress Report (November): Joint effort, primary author Sharon
-# - README.md: Conrad (technical), Ryann (context)
-# - Demonstration: All members (15-minute presentation)
+**Other Deliverables:**
 
-# Approximate Contribution Percentages:
-# Conrad: 28% (Data pipeline, deployment, infrastructure)
-# Sharon: 26% (Statistical modeling, analysis features)
-# Ryann: 24% (Overview/exploration UI, mapping)
-# Alex: 22% (Exploration features, data integration, trends)
-```
+-   Project Plan (October): Joint effort, primary author Sharon Wanyana
+-   Project Plan Peer Review (November): Joint effort, primary authors Alex Arevalo and Ryann Tompkins
+-   Progress Report (November): Joint effort, primary author Sharon Wanyana
+-   Vignette (December): Joint effort, primary author Sharon Wanyana
+-   Demonstration (December): All team members (15-minute presentation)
