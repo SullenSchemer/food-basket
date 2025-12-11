@@ -55,10 +55,10 @@ Our project examines **household food insecurity** which is the economic inabili
 
 Our analysis builds on four domains:
 
-1.  **National trends**—13.5% U.S. food insecurity in 2023 [@usda_ers_2024]
-2.  **Geographic disparities**—rural/southern counties show highest rates [@feeding_america_2024]
-3.  **Socioeconomic determinants**—strong links to income, race, family structure [@gundersen_ziliak_2015]
-4.  **Policy interventions**—SNAP reduces food insecurity \~6% [@gundersen_kreider_pepper_2017].
+1.  **National trends**—13.5% U.S. food insecurity in 2023 [@alma9916546833607426]
+2.  **Geographic disparities**—rural/southern counties show highest rates [@Hake2024_MapTheMealGap]
+3.  **Socioeconomic determinants**—strong links to income, race, family structure [@FeedingAmerica2023_MapTheMealGap]
+4.  **Policy interventions**—SNAP could further reduce food insecurity by up to 62% among current participants [@Gundersen2017_ReconstructingSNAP].
 
 ## 2.3 Data Source
 
@@ -68,7 +68,7 @@ Due to the change in project focus from access to insecurity, our data source wa
 |-------------------|----------------------------|-------------------------|
 | **Definition** | Economic inability to afford food | Geographic proximity to retailers |
 | **Question** | *Can households afford to eat?* | *How far are stores?* |
-| **Data Source** | Feeding America (2009-2023 [@feeding_america_2024] | USDA Atlas (2019) |
+| **Data Source** | Feeding America (2009-2023 [@FeedingAmerica2025_MapTheMealGapData] | USDA Atlas (2019) |
 
 : **Bottom Line:** Communities may have nearby stores but still face high food insecurity due to poverty. We aim to measure affordability, not distance.
 
@@ -149,4 +149,13 @@ Updated data source (USDA → Feeding America), harmonized 11+ years of food ins
 # References {.unnumbered}
 
 ::: {#refs}
+@alma9916546833607426
+
+@Hake2024_MapTheMealGap
+
+@FeedingAmerica2023_MapTheMealGap
+
+@Gundersen2017_ReconstructingSNAP
+
+@FeedingAmerica2025_MapTheMealGapData
 :::

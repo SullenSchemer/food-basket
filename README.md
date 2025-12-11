@@ -604,11 +604,8 @@ If you use this dashboard in research or publications, please cite:
 ```         
 Muhirwe, C. L., Wanyana, S., Tompkins, R., & Arevalo, A. (2024). 
 Investigating U.S. Food Insecurity Through Data: An Interactive R Shiny Dashboard. 
-American University. https://github.com/LinusConradM/FoodInsecurityDashboard
+American University. https://conrad-linus-muhirwe.shinyapps.io/us-food-insecurity-dashboard/
 
-Data sources:
-- Feeding America. (2024). Map the Meal Gap. https://www.feedingamerica.org/research/map-the-meal-gap
-- U.S. Census Bureau. (2024). American Community Survey 5-Year Estimates. https://www.census.gov/programs-surveys/acs
 ```
 
 ------------------------------------------------------------------------

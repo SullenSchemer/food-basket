@@ -45,14 +45,14 @@ ui_overview <- tabPanel(
                 ),
                 p(
                   style = "font-size: 15px; line-height: 1.6; color: #2c3e50; margin-bottom: 12px;",
-                  strong("Food insecurity (FI)"), " is the lack of consistent access to enough food for an active,
-                  healthy life (USDA Economic Research Service, 2024). It affects millions of Americans
+                  strong("Food insecurity (FI)"), " is a household-level economic and social condition characterized by limited or uncertain availability of nutritionally 
+                  adequate and safe foods, or limited or uncertain ability to acquire acceptable foods in socially acceptable ways (USDA, 2025). It affects millions of Americans
                   and is a critical indicator of household economic stability and public health. ",
                   em("Throughout this app, we use 'FI' as an abbreviation for food insecurity.")
                 ),
                 p(
                   style = "font-size: 13px; color: #6c757d; font-style: italic; margin-bottom: 0;",
-                  "In 2023, 13.5% of U.S. households (44.2 million people) experienced food insecurity,
+                  "In 2023, 13.5% of U.S. households (44.2 million people) experienced food insecurity (Rabbitt et al., 2024),
                   with rural and southern counties showing the highest rates."
                 )
               )
@@ -74,23 +74,25 @@ ui_overview <- tabPanel(
                   style = "font-size: 14px; line-height: 1.7; color: #2c3e50; margin-bottom: 0; padding-left: 20px;",
                   tags$li(
                     strong("Health Impacts: "),
-                    "Food insecurity impairs physical and mental health, especially in children,
-                    leading to developmental delays and chronic disease (Coleman-Jensen et al., 2023)"
+                    "Food insecurity is associated with adverse physical and mental health outcomes in 
+                    children, including cognitive problems, behavioral issues, asthma, anemia, and poorer 
+                    overall health (Gundersen & Ziliak, 2015)."
                   ),
                   tags$li(
                     strong("Socioeconomic Links: "),
                     "Strong correlations with poverty, unemployment, and low income across U.S. counties
-                    (Gundersen & Ziliak, 2015)"
+                    (Feeding America, 2023)"
                   ),
                   tags$li(
                     strong("Geographic Disparities: "),
                     "Rural and southern communities face consistently higher rates, with significant
-                    variation by race/ethnicity and household composition (Feeding America, 2024)"
+                    variation by race/ethnicity and household composition (Hake et al., 2024)"
                   ),
                   tags$li(
                     strong("Policy Impact: "),
-                    "SNAP and other interventions reduce food insecurity by approximately 6%, demonstrating
-                    the importance of targeted support (Gundersen et al., 2017)"
+                    "SNAP significantly reduces food insecurity among participating households, and 
+                    research shows increasing benefits could further reduce food insecurity by up to 62% 
+                    among current participants (Gundersen, Kreider, & Pepper, 2017)"
                   )
                 )
               )
@@ -440,8 +442,9 @@ ui_overview <- tabPanel(
                 style = "line-height: 2.2; font-size: 15px; color: #2c3e50;",
                 tags$li(
                   strong("Great Recession Impact: "),
-                  "Food insecurity peaked at 16.3% during the 2009-2010 economic crisis,
-                  affecting rural communities disproportionately"
+                  "As shown in Figure 1, food insecurity rates across all 
+                  states were elevated during 2009-2010 and declined consistently through 2019, with 
+                  notable variation across states ranging from 8% to over 20%."
                 ),
                 tags$li(
                   strong("Recovery Period: "),
@@ -450,7 +453,7 @@ ui_overview <- tabPanel(
                 ),
                 tags$li(
                   strong("COVID-19 Disruption: "),
-                  "Sharp increase to 12.8% in 2020 due to pandemic-related job losses and
+                  "Sharp increase to 12.9% in 2022, following pandemic economic impacts like job losses and
                   economic uncertainty, especially among low-income households"
                 )
               )
@@ -461,8 +464,8 @@ ui_overview <- tabPanel(
                 style = "line-height: 2.2; font-size: 15px; color: #2c3e50;",
                 tags$li(
                   strong("Geographic Disparities: "),
-                  "Rural and southern counties consistently experience 3-5 percentage points
-                  higher food insecurity rates than metropolitan areas (Feeding America, 2024)"
+                  "Rural and southern counties consistently experience 2 percentage points
+                  higher food insecurity rates than metropolitan areas (Hake et al., 2024)"
                 ),
                 tags$li(
                   strong("Racial Inequities: "),
@@ -472,7 +475,7 @@ ui_overview <- tabPanel(
                 tags$li(
                   strong("Cost Burden: "),
                   "Annual food budget shortfall reached $33.3 billion in 2023, with cost per meal
-                  rising 10% since 2022, disproportionately affecting high-poverty counties"
+                  rising 3.58% since 2022, disproportionately affecting high-poverty counties"
                 )
               )
             )
