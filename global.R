@@ -12,14 +12,6 @@ required_packages <- c(
   "nnet", "rpart", "rpart.plot", "broom", "pROC"
 )
 
-# Install missing packages
-missing_packages <- required_packages[!required_packages %in% installed.packages()[, "Package"]]
-
-if (length(missing_packages) > 0) {
-  cat("Installing missing packages:", paste(missing_packages, collapse = ", "), "\n")
-  install.packages(missing_packages, dependencies = TRUE)
-}
-
 # Load packages (with suppressed startup messages for cleaner console)
 suppressPackageStartupMessages({
   library(shiny)
