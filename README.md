@@ -640,3 +640,7 @@ Full license text: https://creativecommons.org/licenses/by/4.0/
 **Last Updated:** December 8, 2025\
 **Version:** 1.0.0\
 **Status:** Production Ready ✅
+
+## License
+
+MIT
